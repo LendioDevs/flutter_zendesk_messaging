@@ -76,7 +76,7 @@ public class ZendeskMessaging: NSObject {
     }
 
     func updatePushNotificationToken(token: String) {
-        PushNotifications.updatePushNotificationToken(token)
+        PushNotifications.updatePushNotificationToken(Data(token.utf8))
         print("\(self.TAG) - updatePushNotificationToken\n")
     }
 }
