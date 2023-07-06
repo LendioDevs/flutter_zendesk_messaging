@@ -8,7 +8,7 @@ import zendesk.android.Zendesk
 import zendesk.android.ZendeskResult
 import zendesk.android.ZendeskUser
 import zendesk.messaging.android.DefaultMessagingFactory
-
+import zendesk.messaging.android.push.PushNotifications
 
 class ZendeskMessaging(private val plugin: ZendeskMessagingPlugin, private val channel: MethodChannel) {
     companion object {
@@ -85,6 +85,15 @@ class ZendeskMessaging(private val plugin: ZendeskMessagingPlugin, private val c
                 println("$tag - Logout failure : ${error.message}")
                 channel.invokeMethod(logoutFailure, mapOf("error" to error.message))
             }
+        }
+    }
+
+     fun updatePushNotificationToken(token: String) {
+        try {
+            PushNotifications.updatePushNotificationToken(token)
+            println("$tag - updatePushNotificationToken")
+        } catch (error: Throwable) {
+            println("$tag - updatePushNotificationToken failure : ${error.message}")
         }
     }
 }

@@ -155,6 +155,14 @@ class ZendeskMessaging {
     }
   }
 
+  static Future<void> updatePushNotificationToken(String token) async {
+    try {
+      await _channel.invokeMethod('updatePushNotificationToken', {'token': token});
+    } catch (e) {
+      debugPrint('ZendeskMessaging - updatePushNotificationToken - Error: $e}');
+    }
+  }
+
   ///  Check if the Zendesk SDK for Android and iOS is already initialized
   static Future<bool> isInitialized() async {
     try {

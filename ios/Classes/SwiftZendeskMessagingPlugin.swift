@@ -5,18 +5,18 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
     let TAG = "[SwiftZendeskMessagingPlugin]"
     private var channel: FlutterMethodChannel
     var isInitialized = false
-    
+
     init(channel: FlutterMethodChannel) {
         self.channel = channel
     }
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "zendesk_messaging", binaryMessenger: registrar.messenger())
         let instance = SwiftZendeskMessagingPlugin(channel: channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
         registrar.addApplicationDelegate(instance)
     }
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let method = call.method
         let arguments = call.arguments as? Dictionary<String, Any>
@@ -57,7 +57,14 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
                 }
                 result(handleMessageCount())
                 break
-            
+            case "updatePushNotificationToken":
+                if (!isInitialized) {
+                    print("\(TAG) - Messaging needs to be initialized first.\n")
+                }
+                let token: String = arguments?["token"] as! String
+                zendeskMessaging.updatePushNotificationToken(token: token)
+                break
+
             case "isInitialized":
                 result(handleInitializedStatus())
                 break
