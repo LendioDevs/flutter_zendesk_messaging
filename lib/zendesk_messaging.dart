@@ -93,11 +93,11 @@ class ZendeskMessaging {
   }
 
   /// Add a list of tags to a support ticket
-  /// 
-  /// Conversation tags are not immediately associated with a conversation when this method is called. 
-  /// It will only be applied to a conversation when end users either start a new 
+  ///
+  /// Conversation tags are not immediately associated with a conversation when this method is called.
+  /// It will only be applied to a conversation when end users either start a new
   /// conversation or send a new message in an existing conversation.
-  /// 
+  ///
   /// For example, to apply "promo_code" and "discount" tags to a conversation about an order, then you would call:
   /// `ZendeskMessaging.setConversationTags(["promo_code","discount"])`
   static Future<void> setConversationTags(List<String> tags) async {
@@ -110,7 +110,7 @@ class ZendeskMessaging {
   }
 
 /// Remove all the tags on the current support ticket
-/// 
+///
   static Future<void> clearConversationTags() async {
     try {
       await _channel.invokeMethod('clearConversationTags');
@@ -189,6 +189,14 @@ class ZendeskMessaging {
     } catch (e) {
       debugPrint('ZendeskMessaging - count - Error: $e}');
       return 0;
+    }
+  }
+
+  static Future<void> updatePushNotificationToken(String token) async {
+    try {
+      await _channel.invokeMethod('updatePushNotificationToken', {'token': token});
+    } catch (e) {
+      debugPrint('ZendeskMessaging - updatePushNotificationToken - Error: $e}');
     }
   }
 

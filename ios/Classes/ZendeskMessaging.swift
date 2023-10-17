@@ -9,9 +9,9 @@ public class ZendeskMessaging: NSObject {
     private static var loginFailure: String = "login_failure"
     private static var logoutSuccess: String = "logout_success"
     private static var logoutFailure: String = "logout_failure"
-    
+
     let TAG = "[ZendeskMessaging]"
-    
+
     private var zendeskPlugin: SwiftZendeskMessagingPlugin? = nil
     private var channel: FlutterMethodChannel? = nil
 
@@ -19,7 +19,7 @@ public class ZendeskMessaging: NSObject {
         self.zendeskPlugin = flutterPlugin
         self.channel = channel
     }
-    
+
     func initialize(channelKey: String) {
         print("\(self.TAG) - Channel Key - \(channelKey)\n")
         Zendesk.initialize(withChannelKey: channelKey, messagingFactory: DefaultMessagingFactory()) { result in
@@ -55,7 +55,7 @@ public class ZendeskMessaging: NSObject {
     func clearConversationTags() {
         Zendesk.instance?.messaging?.clearConversationTags()
     }
-    
+
     func loginUser(jwt: String) {
         Zendesk.instance?.loginUser(with: jwt) { result in
             switch result {
@@ -70,7 +70,7 @@ public class ZendeskMessaging: NSObject {
             }
         }
     }
-    
+
     func logoutUser() {
         Zendesk.instance?.logoutUser { result in
             switch result {
@@ -88,5 +88,10 @@ public class ZendeskMessaging: NSObject {
     func getUnreadMessageCount() -> Int {
         let count = Zendesk.instance?.messaging?.getUnreadMessageCount()
         return count ?? 0
+    }
+
+    func updatePushNotificationToken(token: String) {
+        PushNotifications.updatePushNotificationToken(Data(token.utf8))
+        print("\(self.TAG) - updatePushNotificationToken\n")
     }
 }
