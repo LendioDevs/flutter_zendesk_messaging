@@ -73,12 +73,49 @@ class ZendeskMessaging {
     }
   }
 
+  /// Invalidates the current instance of ZendeskMessaging.
+/// After calling this method you will have to call ZendeskMessaging.initialize again if you would like to use ZendeskMessaging.
+  static Future<void> invalidate() async {
+    try {
+      await _channel.invokeMethod('invalidate');
+    } catch (e) {
+      debugPrint('ZendeskMessaging - invalidate - Error: $e}');
+    }
+  }
+
   /// Start the Zendesk Messaging UI
   static Future<void> show() async {
     try {
       await _channel.invokeMethod('show');
     } catch (e) {
       debugPrint('ZendeskMessaging - show - Error: $e}');
+    }
+  }
+
+  /// Add a list of tags to a support ticket
+  ///
+  /// Conversation tags are not immediately associated with a conversation when this method is called.
+  /// It will only be applied to a conversation when end users either start a new
+  /// conversation or send a new message in an existing conversation.
+  ///
+  /// For example, to apply "promo_code" and "discount" tags to a conversation about an order, then you would call:
+  /// `ZendeskMessaging.setConversationTags(["promo_code","discount"])`
+  static Future<void> setConversationTags(List<String> tags) async {
+    try {
+      await _channel.invokeMethod('setConversationTags',
+          {'tags': tags});
+    } catch (e) {
+      debugPrint('ZendeskMessaging - setConversationTags - Error: $e}');
+    }
+  }
+
+/// Remove all the tags on the current support ticket
+///
+  static Future<void> clearConversationTags() async {
+    try {
+      await _channel.invokeMethod('clearConversationTags');
+    } catch (e) {
+      debugPrint('ZendeskMessaging - clearConversationTags - Error: $e}');
     }
   }
 
@@ -171,6 +208,17 @@ class ZendeskMessaging {
       );
     } catch (e) {
       debugPrint('ZendeskMessaging - isInitialized - Error: $e}');
+      return false;
+    }
+  }
+  ///  Check if the user is already logged in
+  static Future<bool> isLoggedIn() async {
+    try {
+      return await _channel.invokeMethod(
+        'isLoggedIn',
+      );
+    } catch (e) {
+      debugPrint('ZendeskMessaging - isLoggedIn - Error: $e}');
       return false;
     }
   }

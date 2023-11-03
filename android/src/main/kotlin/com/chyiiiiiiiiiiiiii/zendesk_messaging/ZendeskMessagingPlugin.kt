@@ -19,6 +19,7 @@ class ZendeskMessagingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
     var activity: Activity? = null
     var isInitialized: Boolean = false
+    var isLoggedIn: Boolean = false
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
         val sendData: Any? = call.arguments
@@ -42,6 +43,11 @@ class ZendeskMessagingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "isInitialized" -> {
                 result.success(isInitialized)
+                return
+            }
+            "isLoggedIn" -> {
+                result.success(isLoggedIn)
+                return
             }
             "loginUser" -> {
                 if (!isInitialized) {
@@ -92,6 +98,39 @@ class ZendeskMessagingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     println(err.message)
                     return
                 }
+            }
+            "setConversationTags" -> {
+                if (!isInitialized) {
+                    println("$tag - Messaging needs to be initialized first")
+                    return
+                }
+
+                try {
+                    val tags = call.argument<List<String>>("tags")
+                    if (tags == null) {
+                        throw Exception("tags is empty or null")
+                    }
+
+                    zendeskMessaging.setConversationTags(tags)
+                } catch (err: Throwable) {
+                    println("$tag - Messaging::setConversationTags invalid arguments. {'tags': '<your_tags>'} expected !")
+                    println(err.message)
+                    return
+                }
+            }
+            "clearConversationTags" -> {
+                if (!isInitialized) {
+                    println("$tag - Messaging needs to be initialized first")
+                    return
+                }
+                zendeskMessaging.clearConversationTags()
+            }
+            "invalidate" -> {
+                if (!isInitialized) {
+                    println("$tag - Messaging is already on an invalid state")
+                    return
+                }
+                zendeskMessaging.invalidate()
             }
             else -> {
                 result.notImplemented()

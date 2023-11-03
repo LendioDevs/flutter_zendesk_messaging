@@ -1,3 +1,16 @@
+## 2.7.7
+
+* Add ```invalidate()``` to invalidate the current instance of ZendeskMessaging
+
+## 2.7.6
+
+* Add conversation tag
+
+## 2.7.5
+
+* Upgrade Flutter sdk version
+* Upgrade zendesk-messaging sdk version to 2.11.0
+
 ## 2.7.4
 
 * Upgrade ZendeskSDKMessaging of iOS to v2.9.0 to be compatible with Xcode 14.3

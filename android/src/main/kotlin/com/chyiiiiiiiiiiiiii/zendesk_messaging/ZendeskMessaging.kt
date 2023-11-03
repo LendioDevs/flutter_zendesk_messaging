@@ -43,10 +43,17 @@ class ZendeskMessaging(private val plugin: ZendeskMessagingPlugin, private val c
         )
     }
 
+    fun invalidate() {
+        Zendesk.invalidate()
+        plugin.isInitialized = false;
+        println("$tag - invalidated")
+    }
+
     fun show() {
         Zendesk.instance.messaging.showMessaging(plugin.activity!!, Intent.FLAG_ACTIVITY_NEW_TASK)
         println("$tag - show")
     }
+
     fun getUnreadMessageCount(): Int {
         return try {
             Zendesk.instance.messaging.getUnreadMessageCount()
@@ -55,10 +62,19 @@ class ZendeskMessaging(private val plugin: ZendeskMessagingPlugin, private val c
         }
     }
 
+    fun setConversationTags(tags: List<String>){
+        Zendesk.instance.messaging.setConversationTags(tags)
+    }
+
+    fun clearConversationTags(){
+        Zendesk.instance.messaging.clearConversationTags()
+    }
+
     fun loginUser(jwt: String) {
         Zendesk.instance.loginUser(
             jwt,
             { value: ZendeskUser? ->
+                plugin.isLoggedIn = true;
                 value?.let {
                     channel.invokeMethod(loginSuccess, mapOf("id" to it.id, "externalId" to it.externalId))
                 } ?: run {
@@ -75,12 +91,12 @@ class ZendeskMessaging(private val plugin: ZendeskMessagingPlugin, private val c
     fun logoutUser() {
         GlobalScope.launch (Dispatchers.Main)  {
             try {
-                val result = Zendesk.instance.logoutUser()
-                if (result is ZendeskResult.Failure) {
-                    channel.invokeMethod(logoutFailure, null)
-                } else {
+                Zendesk.instance.logoutUser(successCallback = {
+                    plugin.isLoggedIn = false;
                     channel.invokeMethod(logoutSuccess, null)
-                }
+                }, failureCallback = {
+                    channel.invokeMethod(logoutFailure, null)
+                });
             } catch (error: Throwable) {
                 println("$tag - Logout failure : ${error.message}")
                 channel.invokeMethod(logoutFailure, mapOf("error" to error.message))

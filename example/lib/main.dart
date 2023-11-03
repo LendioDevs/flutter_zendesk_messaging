@@ -33,6 +33,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void dispose() {
+    ZendeskMessaging.invalidate();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final message = channelMessages.join("\n");
 
@@ -68,12 +74,24 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
                 ElevatedButton(
+                  onPressed: () => _setTags(),
+                  child: const Text("Add tags"),
+                ),
+                ElevatedButton(
+                  onPressed: () => _clearTags(),
+                  child: const Text("Clear tags"),
+                ),
+                ElevatedButton(
                   onPressed: () => _login(),
                   child: const Text("Login"),
                 ),
                 ElevatedButton(
                   onPressed: () => _logout(),
                   child: const Text("Logout"),
+                ),
+                ElevatedButton(
+                  onPressed: () => _checkUserLoggedIn(),
+                  child: const Text("Check LoggedIn"),
                 ),
               ],
             ),
@@ -104,12 +122,24 @@ class _MyAppState extends State<MyApp> {
       isLogin = false;
     });
   }
-
-  void _getUnreadMessageCount() async {
+    void _getUnreadMessageCount() async {
     final messageCount = await ZendeskMessaging.getUnreadMessageCount();
     if (mounted) {
       unreadMessageCount = messageCount;
       setState(() {});
     }
+  }
+  void _setTags() async {
+    final tags = ['tag1', 'tag2', 'tag3'];
+    await ZendeskMessaging.setConversationTags(tags);
+  }
+  void _clearTags() async {
+    await ZendeskMessaging.clearConversationTags();
+  }
+  void _checkUserLoggedIn()async {
+   final isLoggedIn = await ZendeskMessaging.isLoggedIn();
+   setState(() {
+     channelMessages.add('User is ${isLoggedIn?'':'not'} logged in');
+   });
   }
 }

@@ -5,6 +5,7 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
     let TAG = "[SwiftZendeskMessagingPlugin]"
     private var channel: FlutterMethodChannel
     var isInitialized = false
+    var isLoggedIn = false
 
     init(channel: FlutterMethodChannel) {
         self.channel = channel
@@ -64,9 +65,32 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
                 let token: String = arguments?["token"] as! String
                 zendeskMessaging.updatePushNotificationToken(token: token)
                 break
-
             case "isInitialized":
                 result(handleInitializedStatus())
+                break
+            case "isLoggedIn":
+                result(handleLoggedInStatus())
+                break
+
+            case "setConversationTags":
+                if (!isInitialized) {
+                    print("\(TAG) - Messaging needs to be initialized first.\n")
+                }
+                let tags: [String] = arguments?["tags"] as! [String]
+                zendeskMessaging.setConversationTags(tags:tags)
+                break
+            case "clearConversationTags":
+                if (!isInitialized) {
+                    print("\(TAG) - Messaging needs to be initialized first.\n")
+                }
+                zendeskMessaging.clearConversationTags()
+                break
+            case "invalidate":
+                if (!isInitialized) {
+                    print("\(TAG) - Messaging is already on an invalid state\n")
+                    return
+                }
+                zendeskMessaging.invalidate()
                 break
             default:
                 break
@@ -82,5 +106,8 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
     }
     private func handleInitializedStatus() ->Bool{
         return isInitialized
+    }
+    private func handleLoggedInStatus() ->Bool{
+        return isLoggedIn
     }
 }

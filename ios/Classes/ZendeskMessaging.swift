@@ -35,6 +35,12 @@ public class ZendeskMessaging: NSObject {
         }
     }
 
+     func invalidate() {
+        Zendesk.invalidate()
+       self.zendeskPlugin?.isInitialized = false
+       print("\(self.TAG) - invalidate")
+    }
+
     func show(rootViewController: UIViewController?) {
         guard let messagingViewController = Zendesk.instance?.messaging?.messagingViewController() else { return }
         guard let rootViewController = rootViewController else { return }
@@ -42,10 +48,19 @@ public class ZendeskMessaging: NSObject {
         print("\(self.TAG) - show")
     }
 
+    func setConversationTags(tags: [String]) {
+        Zendesk.instance?.messaging?.setConversationTags(tags)
+    }
+
+    func clearConversationTags() {
+        Zendesk.instance?.messaging?.clearConversationTags()
+    }
+
     func loginUser(jwt: String) {
         Zendesk.instance?.loginUser(with: jwt) { result in
             switch result {
             case .success(let user):
+            self.zendeskPlugin?.isLoggedIn = true
                 self.channel?.invokeMethod(ZendeskMessaging.loginSuccess, arguments: ["id": user.id, "externalId": user.externalId])
                 break;
             case .failure(let error):
@@ -60,6 +75,7 @@ public class ZendeskMessaging: NSObject {
         Zendesk.instance?.logoutUser { result in
             switch result {
             case .success:
+                self.zendeskPlugin?.isLoggedIn = false
                 self.channel?.invokeMethod(ZendeskMessaging.logoutSuccess, arguments: [])
                 break;
             case .failure(let error):
